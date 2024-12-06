@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить документ{% endblock %}
+{% block content %}
+<h1>Удалить документ</h1>
+<p>Вы уверенны, что хотите удалить документ "{{ object.name }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Удалить</button>
+</form>
+<a href="{% url 'document_search' %}">Отмена</a>
+{% endblock %}

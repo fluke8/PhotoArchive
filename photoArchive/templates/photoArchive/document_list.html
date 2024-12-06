@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Documents{% endblock %}
+{% block content %}
+<h1>Document List</h1>
+    <ul>
+        {% for doc in documents %}
+            <li>
+                <a href="{% url 'document_detail' doc.pk %}">{{ doc.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'document_create' %}">Add Document</a>
+{% endblock %}
+

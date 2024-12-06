@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Документы{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Поиск Документов</h1>
+    <form method="get" action="{% url 'document_search' %}" class="mb-4">
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            <input type="text" name="{{ form.name.name }}" class="form-control" value="{{ form.name.value|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            {{ form.start_date.label_tag }}
+            <input type="date" name="{{ form.start_date.name }}" class="form-control" value="{{ form.start_date.value|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            {{ form.end_date.label_tag }}
+            <input type="date" name="{{ form.end_date.name }}" class="form-control" value="{{ form.end_date.value|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            {{ form.tags.label_tag }}
+            <select name="{{ form.tags.name }}" class="form-control" multiple>
+                {% for tag in tags %}
+                    <option value="{{ tag.id }}" {% if tag.id|stringformat:"s" in form.tags.value|stringformat:"s" %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Искать</button>
+    </form>
+
+    {% if results %}
+        <h2 class="mb-3">Результаты:</h2>
+        <div class="list-group">
+            {% for doc in results %}
+                <div class="list-group-item">
+                    <div class="row">
+                        
+                        <div class="col-md-9">
+                            <h5 class="mb-1"><a href="{% url 'document_detail' doc.id %}">{{ doc.name }}</a></h5>
+                            <p class="mb-1">{{ doc.description }}</p>
+                            {% if doc.tags.all %}
+                                <p class="mb-1">
+                                    <strong>Теги:</strong>
+                                    {% for tag in doc.tags.all %}
+                                        <span class="badge badge-secondary">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </p>
+                            {% else %}
+                                <p class="mb-1"><strong>Теги:</strong> Нет тегов</p>
+                            {% endif %}
+                            <small class="text-muted">Загружен: {{ doc.uploaded_at }}</small><br>
+                            <small class="text-muted">Создан: {{ doc.created_at }}</small>
+                        </div>
+                        <div class="col-md-3 d-flex img-fluid">
+                            {% if doc.images.all  %}
+                                {% for image in doc.images.all %}
+                                    <div class="image_holder ">
+                                        <img src="{{ image.image.url }}" class="img-thumbnail" alt="{{ doc.name }}">
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <img src="{% static 'images/svin.jpg' %}" class="img-thumbnail" alt="No Image">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Результаты не найдены.</p>
+    {% endif %}
+</div>
+{% endblock %}

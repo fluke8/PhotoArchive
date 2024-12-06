@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить документ{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Добавить документ</h1>
+    <form method="post" enctype="multipart/form-data" id="document-form" class="mb-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ image_formset.management_form }}
+        <div id="image-forms">
+            {% for form in image_formset %}
+            <div class="image-form mb-3" style="display: none;">
+                {{ form.as_p }}
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-image-form" class="btn btn-secondary">Add Another Image</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addImageFormButton = document.getElementById('add-image-form');
+        const imageFormsContainer = document.getElementById('image-forms');
+        const totalForms = document.getElementById('id_image_formset-TOTAL_FORMS');
+        const imageForms = document.querySelectorAll('.image-form');
+
+        // Показать первую форму
+        if (imageForms.length > 0) {
+            imageForms[0].style.display = 'block';
+        }
+
+        addImageFormButton.addEventListener('click', function () {
+            const visibleForms = document.querySelectorAll('.image-form:not([style="display: none;"])');
+            const lastVisibleForm = visibleForms[visibleForms.length - 1];
+            const fileInput = lastVisibleForm.querySelector('input[type="file"]');
+
+            if (fileInput.files.length > 0) {
+                const nextForm = lastVisibleForm.nextElementSibling;
+                if (nextForm) {
+                    nextForm.style.display = 'block';
+                } else {
+                    const newFormIndex = imageFormsContainer.children.length;
+                    const newForm = document.createElement('div');
+                    newForm.className = 'image-form';
+                    newForm.innerHTML = `
+                        <input type="file" name="image_formset-${newFormIndex}-image" id="id_image_formset-${newFormIndex}-image">
+                    `;
+                    imageFormsContainer.appendChild(newForm);
+                    totalForms.setAttribute('value', newFormIndex + 1);
+                }
+            } else {
+                alert('Please select a file before adding another image form.');
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}
